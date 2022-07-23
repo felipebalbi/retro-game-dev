@@ -15,6 +15,11 @@ QUIET_CLEAN	= $(Q:@=@echo    '     CLEAN    '$@;)
 
 # Programs
 X64		:= $(shell which x64)
+
+ifeq (, $(X64))
+X64		:= $(shell which x64sc)
+endif
+
 AS		:= $(shell which acme)
 RM		:= $(shell which rm)
 C1541		:= $(shell which c1541)
