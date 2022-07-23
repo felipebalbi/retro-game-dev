@@ -3,3 +3,4 @@ orig/
 *.sym
 *.lst
 *.d64
+.DS_Store
