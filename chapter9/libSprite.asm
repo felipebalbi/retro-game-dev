@@ -30,7 +30,7 @@ spriteNumberMask:
 	;; /1 = Sprite Number (Address)
        
 	ldy sprite
-	lda SpriteNumberMask,y
+	lda spriteNumberMask,y
 	and SPSPCL
 }
 
