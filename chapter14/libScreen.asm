@@ -638,7 +638,7 @@ libScreen_PixelToChar
 	sta ZeroPageParam2
 	lda charOffset
 	sta ZeroPageParam3
-	lda #offset
+	lda #char
 	sta ZeroPageParam4
 	jsr libScreen_SetMapChar
 }
