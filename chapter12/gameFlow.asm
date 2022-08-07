@@ -33,7 +33,7 @@ flowStartY	!byte 20
 
 flowStartText		!text "press fire to start"
 			!byte 0
-flowStartClearText	!text "			 "
+flowStartClearText	!text "                   "
 			!byte 0
 
 flowScoreText		!text "score:"
