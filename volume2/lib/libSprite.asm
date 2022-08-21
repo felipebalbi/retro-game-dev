@@ -74,23 +74,23 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 	; If was inactive then needs update
 	lda spriteAnimsActive,y
-	beq changed
+	beq @changed
 
 	; If different start frame then needs update
 	lda spriteAnimsStartFrame,y
 	cmp bStartFrame
-	bne changed
+	bne @changed
 
 	; If different end frame then needs update
 	lda spriteAnimsEndFrame,y
 	cmp bEndFrame
-	bne changed
+	bne @changed
 
 	; Else doesn't need update, skip to end
-	jmp end
+	jmp @end
 
 	; Update sprite variables 
-changed:
+@changed:
 	lda #True
 	sta spriteAnimsActive,y
 	lda bStartFrame
@@ -107,7 +107,7 @@ changed:
         lda #0
 	}
 	sta spriteAnimsLoop,y
-end:
+@end:
 }
 
 ;==============================================================================
@@ -117,23 +117,23 @@ end:
 
 	; If was inactive then needs update
 	lda spriteAnimsActive,y
-	beq changed
+	beq @changed
 
 	; If different start frame then needs update
 	lda spriteAnimsStartFrame,y
 	cmp #bStartFrame
-	bne changed
+	bne @changed
 
 	; If different end frame then needs update
 	lda spriteAnimsEndFrame,y
 	cmp #bEndFrame
-	bne changed
+	bne @changed
 
 	; Else doesn't need update, skip to end
-	jmp end
+	jmp @end
 
 	; Update sprite variables
-changed:
+@changed:
 	lda #1
 	sta spriteAnimsActive,y
 	lda #bStartFrame
@@ -150,7 +150,7 @@ changed:
         lda #0
 	}
 	sta spriteAnimsLoop,y
-end:
+@end:
 }
 
 ;==============================================================================
@@ -255,11 +255,11 @@ end:
 	and MSIGX       ; clear the bit
 	sta MSIGX       ; and store
 	lda wXPos+1     ; get XPos High Byte
-	beq end         ; skip if XPos High Byte is zero
+	beq @end         ; skip if XPos High Byte is zero
 	lda spriteNumberMask,y  ; get sprite mask
 	ora MSIGX       ; set the bit
 	sta MSIGX       ; and store
-end:
+@end:
 }
 
 ;==============================================================================
@@ -278,11 +278,11 @@ end:
 	and MSIGX       ; clear the bit
 	sta MSIGX       ; and store
 	lda wXPos+1     ; get XPos High Byte
-	beq end         ; skip if XPos High Byte is zero
+	beq @end         ; skip if XPos High Byte is zero
 	lda spriteNumberMask,y  ; get sprite mask
 	ora MSIGX       ; set the bit
 	sta MSIGX       ; and store
-end:
+@end:
 }
 
 ;==============================================================================
@@ -301,11 +301,11 @@ end:
 	and MSIGX       ; clear the bit
 	sta MSIGX       ; and store
 	lda wXPos+1     ; get XPos High Byte
-	beq end         ; skip if XPos High Byte is zero
+	beq @end         ; skip if XPos High Byte is zero
 	lda spriteNumberMask,y  ; get sprite mask
 	ora MSIGX       ; set the bit
 	sta MSIGX       ; and store
-end:
+@end:
 }
 
 ;==============================================================================
@@ -320,12 +320,12 @@ end:
 
 !macro LIBSPRITE_UPDATE {
 	ldx #0
-loop:
+@loop:
 	; skip this sprite anim if not active
 	lda spriteAnimsActive,X
-	bne active
-	jmp skip
-active:
+	bne @active
+	jmp @skip
+@active:
 
 	stx spriteAnimsCurrent
 	lda spriteAnimsFrame,X
@@ -341,7 +341,7 @@ active:
 	sta SPRITE0PTR,y
 
 	dec spriteAnimsDelay,X
-	bne skip
+	bne @skip
 
 	; reset the delay
 	lda spriteAnimsSpeed,X
@@ -353,26 +353,26 @@ active:
 	; check if reached the end frame
 	lda spriteAnimsEndFrameCurrent
 	cmp spriteAnimsFrame,X
-	bcs skip
+	bcs @skip
 
 	; check if looping
 	lda spriteAnimsLoop,X
-	beq destroy
+	beq @destroy
 
 	; reset the frame
 	lda spriteAnimsStartFrame,X
 	sta spriteAnimsFrame,X
-	jmp skip
+	jmp @skip
 
-destroy:
+@destroy:
 	; turn off
 	lda #0
 	sta spriteAnimsActive,X
 	+LIBSPRITE_ENABLE_AV(spriteAnimsCurrent, false)
 
-skip:
+@skip:
 	; loop for each sprite anim
 	inx
 	cpx #SpriteAnimsMax
-	bne loop
+	bne @loop
 }

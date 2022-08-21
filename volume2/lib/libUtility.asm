@@ -48,20 +48,20 @@ libUtilityRti:
 !macro LIBUTILITY_SET1000_AV wStart, bValue {
 	lda #bValue         ; Get value to set
 	ldx #250            ; Set loop value
-loop:
+@loop:
 	dex                 ; Step -1
 	sta wStart,x        ; Set start + x
 	sta wStart+250,x    ; Set start + 250 + x
 	sta wStart+500,x    ; Set start + 500 + x
 	sta wStart+750,x    ; Set start + 750 + x
-	bne loop            ; If x != 0 loop
+	bne @loop            ; If x != 0 loop
 }
 
 ;===============================================================================
 
 !macro LIBUTILITY_WAITLOOP_V bNumLoops {
 	ldx #bNumLoops
-loop:
+@loop:
 	dex
-	bne loop
+	bne @loop
 }

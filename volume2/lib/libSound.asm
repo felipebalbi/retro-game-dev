@@ -34,18 +34,18 @@ soundNTSCTimer:     !byte 0
 !macro LIBSOUND_UPDATE_A wSidfile {
 	lda soundIsPAL
 	cmp #1		; Is system PAL?
-	beq pal		; Yes.
+	beq @pal		; Yes.
 
 	;; System is NTSC
 	inc soundNTSCTimer
 	lda soundNTSCTimer
 	cmp #6		; Music delay
-	beq resetNTSCTimer  
-pal:
+	beq @resetNTSCTimer  
+@pal:
 	jsr wSidfile+3
-	jmp end
-resetNTSCTimer:
+	jmp @end
+@resetNTSCTimer:
 	lda #0
 	sta soundNTSCTimer
-end:    
+@end:    
 }

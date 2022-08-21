@@ -114,18 +114,18 @@ wColorRAMRowStart: ; COLORRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
 	ldy #bXPos                  ; load x position into Y register
 
 	ldx #0
-loop:
+@loop:
 	lda string,X
 	cmp #0
-	beq done
+	beq @done
 	;cmp #Space
-	;beq noAdjust
-	;noAdjust:
+	;beq @noAdjust
+	;@noAdjust:
 	sta (ZeroPage2),Y
 	inx
 	iny
-	jmp loop
-done:
+	jmp @loop
+@done:
 }
 
 ;==============================================================================
@@ -171,9 +171,9 @@ done:
 
 	; Adjust for XHigh
 	lda wXPixels+1
-	beq nothigh
+	beq @nothigh
 	+LIBMATH_ADD8BIT_AVA bXChar, 32, bXChar ; shift across 32 chars
-nothigh:
+@nothigh:
 	; divide by 8 to get character Y
 	lda bYPixels
 	lsr ; divide by 2
@@ -200,7 +200,7 @@ nothigh:
 	+LIBSCREEN_SETDISPLAYENABLE_V(false) ; Disable display while updating
 
 	ldx #0                  ; set x counter to 0
-loop:
+@loop:
 	lda wBackground,x       ; get background + x
 	sta SCREENRAM,x         ; set SCREENRAM + x
 	tay                     ; transfer accumulator to y register
@@ -227,7 +227,7 @@ loop:
 	
 	inx                     ; increment x counter
 	cpx #251
-	bcc loop                ; loop 250 times (4 sections x 250 = 1000 bytes set)
+	bcc @loop                ; loop 250 times (4 sections x 250 = 1000 bytes set)
 	
 	+LIBSCREEN_SETDISPLAYENABLE_V(true) ; Re-enable display
 }

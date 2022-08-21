@@ -47,7 +47,7 @@ bMathRandomCurrent2: !byte 0
 	sta wOut
 	sta wOut+1
 	ldx #8		; The number of source bits
-cnvBit:
+@cnvBit:
 	asl ZeroPage13	; Shift out one bit
 	lda wOut	; And add into result
 	adc wOut
@@ -56,7 +56,7 @@ cnvBit:
 	adc wOut+1
 	sta wOut+1
 	dex		; And repeat for next bit
-	bne cnvBit
+	bne @cnvBit
 	cld		; Back to binary
 }
 
@@ -73,7 +73,7 @@ cnvBit:
 	sta wOut+1
 	sta bOut
 	ldx #16		; The number of source bits
-cnvBit:
+@cnvBit:
 	asl wIn		; Shift out one bit
 	rol wIn+1
 	lda wOut	; And add into result
@@ -86,7 +86,7 @@ cnvBit:
 	adc bOut
 	sta bOut
 	dex		; And repeat for next bit
-	bne cnvBit
+	bne @cnvBit
 	cld		; Back to binary
 	sty wIn		; Restore
 	lda ZeroPage1
@@ -135,9 +135,9 @@ cnvBit:
 !macro LIBMATH_MAX8BIT_AV bNum1, bNum2 {
 	lda #bNum2	    ; Load Number 2
 	cmp bNum1	    ; Compare with Number 1
-	bcc skip	    ; If Number 2 < Number 1 then skip
+	bcc @skip	    ; If Number 2 < Number 1 then skip
 	sta bNum1	    ; Else replace Number1 with Number2
-skip:
+@skip:
 }
 
 ;;; ============================================================================
@@ -146,17 +146,17 @@ skip:
 !macro LIBMATH_MAX16BIT_AV wNum1, wNum2 {
 	lda wNum1+1	    ; high bytes
 	cmp #>wNum2
-	bcc LsThan	    ; hiVal1 < hiVal2 --> Val1 < Val2
-	bne GrtEqu	    ; hiVal1 ≠ hiVal2 --> Val1 > Val2
+	bcc @LsThan	    ; hiVal1 < hiVal2 --> Val1 < Val2
+	bne @GrtEqu	    ; hiVal1 ≠ hiVal2 --> Val1 > Val2
 	lda wNum1	    ; low bytes
 	cmp #<wNum2
-	bcs GrtEqu	    ; loVal1 ≥ loVal2 --> Val1 ≥ Val2
-LsThan:
+	bcs @GrtEqu	    ; loVal1 ≥ loVal2 --> Val1 ≥ Val2
+@LsThan:
 	lda #>wNum2	    ; replace wNum1 with wNum2
 	sta wNum1+1
 	lda #<wNum2
 	sta wNum1
-GrtEqu:
+@GrtEqu:
 }
 
 ;;; ============================================================================
@@ -164,9 +164,9 @@ GrtEqu:
 !macro LIBMATH_MIN8BIT_AV bNum1, bNum2 {
 	lda #bNum2	    ; Load Number 2
 	cmp bNum1	    ; Compare with Number 1
-	bcs skip	    ; If Number 2 >= Number 1 then skip
+	bcs @skip	    ; If Number 2 >= Number 1 then skip
 	sta bNum1	    ; Else replace Number1 with Number2
-skip:
+@skip:
 }
 
 ;;; ============================================================================
@@ -175,19 +175,19 @@ skip:
 !macro LIBMATH_MIN16BIT_AV wNum1, wNum2 {
 	lda wNum1+1	    ; high bytes
 	cmp #>wNum2
-	bcc LsThan	    ; hiVal1 < hiVal2 --> Val1 < Val2
-	bne GrtEqu	    ; hiVal1 ≠ hiVal2 --> Val1 > Val2
+	bcc @LsThan	    ; hiVal1 < hiVal2 --> Val1 < Val2
+	bne @GrtEqu	    ; hiVal1 ≠ hiVal2 --> Val1 > Val2
 	lda wNum1	    ; low bytes
 	cmp #<wNum2
-	bcs GrtEqu	    ; loVal1 ≥ loVal2 --> Val1 ≥ Val2
-LsThan:
-	jmp End	    ; end
-GrtEqu:
+	bcs @GrtEqu	    ; loVal1 ≥ loVal2 --> Val1 ≥ Val2
+@LsThan:
+	jmp @end	    ; end
+@GrtEqu:
 	lda #>wNum2	    ; replace wNum1 with wNum2
 	sta wNum1+1
 	lda #<wNum2
 	sta wNum1
-End:
+@end:
 }
 
 ;;; ============================================================================
@@ -201,10 +201,10 @@ End:
 				; if bCurrent == MathRandomMax, reset to 0
 	lda bCurrent    
 	cmp #MathRandomMax	
-	bne end
+	bne @end
 	lda #0
 	sta bCurrent
-end:	
+@end:	
 }
 
 ;;; ============================================================================
