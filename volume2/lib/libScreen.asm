@@ -15,11 +15,11 @@ YELLOW		= 7
 ORANGE		= 8
 BROWN		= 9
 LIGHTRED	= 10
-DARKGRAY	= 11
-MEDIUMGRAY	= 12
-LIGHTGREEN	= 13
-LIGHTBLUE	= 14
-LIGHTGRAY	= 15
+DARK_GRAY	= 11
+MEDIUM_GRAY	= 12
+LIGHT_GREEN	= 13
+LIGHT_BLUE	= 14
+LIGHT_GRAY	= 15
 
 ;==============================================================================
 ; Variables
