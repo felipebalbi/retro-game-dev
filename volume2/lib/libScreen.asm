@@ -41,13 +41,13 @@ wColorRAMRowStart: ; COLORRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
 ;==============================================================================
 ; Macros
 
-!macro LIBSCREEN_DEBUG8BIT_VVA bXPos, bYPos, bIn {
-	+LIBMATH_8BITTOBCD_AA bIn, ZeroPage4
+!macro LIBSCREEN_DEBUG8BIT_VVA .bXPos, .bYPos, .bIn {
+	+LIBMATH_8BITTOBCD_AA .bIn, ZeroPage4
 	lda ZeroPage4
 	and #%00001111      ; get low nibble
 	ora #$30            ; convert to ascii
 	sta ZeroPage6
-	+LIBSCREEN_SETCHARACTER_S_VVA bXPos+2, bYPos, ZeroPage6
+	+LIBSCREEN_SETCHARACTER_S_VVA .bXPos+2, .bYPos, ZeroPage6
 	lda ZeroPage4
 	lsr                 ; get high nibble
 	lsr
@@ -55,23 +55,23 @@ wColorRAMRowStart: ; COLORRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
 	lsr
 	ora #$30            ; convert to ascii
 	sta ZeroPage6
-	+LIBSCREEN_SETCHARACTER_S_VVA bXPos+1, bYPos, ZeroPage6
+	+LIBSCREEN_SETCHARACTER_S_VVA .bXPos+1, .bYPos, ZeroPage6
 	lda ZeroPage5
 	and #%00001111      ; get low nibble
 	ora #$30            ; convert to ascii
 	sta ZeroPage6
-	+LIBSCREEN_SETCHARACTER_S_VVA bXPos, bYPos, ZeroPage6
+	+LIBSCREEN_SETCHARACTER_S_VVA .bXPos, .bYPos, ZeroPage6
 }
 
 ;==============================================================================
 
-!macro LIBSCREEN_DEBUG16BIT_VVA bXPos, bYPos, wIn {
-	+LIBMATH_16BITTOBCD_AAA wIn, ZeroPage6, ZeroPage8
+!macro LIBSCREEN_DEBUG16BIT_VVA .bXPos, .bYPos, .wIn {
+	+LIBMATH_16BITTOBCD_AAA .wIn, ZeroPage6, ZeroPage8
 	lda ZeroPage6
 	and #%00001111      ; get low nibble
 	ora #$30            ; convert to ascii
 	sta ZeroPage12
-	+LIBSCREEN_SETCHARACTER_S_VVA bXPos+4, bYPos, ZeroPage12
+	+LIBSCREEN_SETCHARACTER_S_VVA .bXPos+4, .bYPos, ZeroPage12
 	lda ZeroPage6
 	lsr                 ; get high nibble
 	lsr
@@ -79,12 +79,12 @@ wColorRAMRowStart: ; COLORRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
 	lsr
 	ora #$30            ; convert to ascii
 	sta ZeroPage12
-	+LIBSCREEN_SETCHARACTER_S_VVA bXPos+3, bYPos, ZeroPage12
+	+LIBSCREEN_SETCHARACTER_S_VVA .bXPos+3, .bYPos, ZeroPage12
 	lda ZeroPage7
 	and #%00001111      ; get low nibble
 	ora #$30            ; convert to ascii
 	sta ZeroPage12
-	+LIBSCREEN_SETCHARACTER_S_VVA bXPos+2, bYPos, ZeroPage12
+	+LIBSCREEN_SETCHARACTER_S_VVA .bXPos+2, .bYPos, ZeroPage12
 	lda ZeroPage7
 	lsr                 ; get high nibble
 	lsr
@@ -92,36 +92,36 @@ wColorRAMRowStart: ; COLORRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
 	lsr
 	ora #$30            ; convert to ascii
 	sta ZeroPage12
-	+LIBSCREEN_SETCHARACTER_S_VVA bXPos+1, bYPos, ZeroPage12
+	+LIBSCREEN_SETCHARACTER_S_VVA .bXPos+1, .bYPos, ZeroPage12
 	lda ZeroPage8
 	and #%00001111      ; get low nibble
 	ora #$30            ; convert to ascii
 	sta ZeroPage12
-	+LIBSCREEN_SETCHARACTER_S_VVA bXPos, bYPos, ZeroPage12
+	+LIBSCREEN_SETCHARACTER_S_VVA .bXPos, .bYPos, ZeroPage12
 }
 
 ;==============================================================================
 
-!macro LIBSCREEN_DRAWTEXT_VVA bXPos, bYPos, string {
-	lda #bYPos                  ; load y position as index into list
+!macro LIBSCREEN_DRAWTEXT_VVA .bXPos, .bYPos, .string {
+	lda #.bYPos                  ; load y position as index into list
 	asl                         ; X2 as table is in words
 	tay                         ; Copy A to Y
-	lda wScreenRAMRowStart,Y    ; load low address byte
+	lda wScreenRAMRowStart,y    ; load low address byte
 	sta ZeroPage2
-	lda wScreenRAMRowStart+1,Y  ; load high address byte
+	lda wScreenRAMRowStart+1,y  ; load high address byte
 	sta ZeroPage3
 
-	ldy #bXPos                  ; load x position into Y register
+	ldy #.bXPos                  ; load x position into Y register
 
 	ldx #0
 @loop:
-	lda string,X
+	lda .string,x
 	cmp #0
 	beq @done
 	;cmp #Space
 	;beq @noAdjust
 	;@noAdjust:
-	sta (ZeroPage2),Y
+	sta (ZeroPage2),y
 	inx
 	iny
 	jmp @loop
@@ -130,33 +130,33 @@ wColorRAMRowStart: ; COLORRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
 
 ;==============================================================================
 
-!macro LIBSCREEN_GETCHARACTER_AAA bXPos, bYPos, bOut {
-	lda bYPos                   ; load y position as index into list
+!macro LIBSCREEN_GETCHARACTER_AAA .bXPos, .bYPos, .bOut {
+	lda .bYPos                   ; load y position as index into list
 	asl                         ; X2 as table is in words
 	tay                         ; Copy A to Y
-	lda wScreenRAMRowStart,Y    ; load low address byte
+	lda wScreenRAMRowStart,y    ; load low address byte
 	sta ZeroPage2
-	lda wScreenRAMRowStart+1,Y  ; load high address byte
+	lda wScreenRAMRowStart+1,y  ; load high address byte
 	sta ZeroPage3
-	ldy bXPos                   ; load x position into Y register
-	lda (ZeroPage2),Y
-	sta bOut
+	ldy .bXPos                   ; load x position into Y register
+	lda (ZeroPage2),y
+	sta .bOut
 }
 
 ;==============================================================================
 
-!macro LIBSCREEN_GETCOLOR_AAA bXPos, bYPos, bOut {
-	lda bYPos                   ; load y position as index into list
+!macro LIBSCREEN_GETCOLOR_AAA .bXPos, .bYPos, .bOut {
+	lda .bYPos                   ; load y position as index into list
 	asl                         ; X2 as table is in words
 	tay                         ; Copy A to Y
-	lda wColorRAMRowStart,Y     ; load low address byte
+	lda wColorRAMRowStart,y     ; load low address byte
 	sta ZeroPage2
-	lda wColorRAMRowStart+1,Y   ; load high address byte
+	lda wColorRAMRowStart+1,y   ; load high address byte
 	sta ZeroPage3
-	ldy bXPos                   ; load x position into Y register
-	lda (ZeroPage2),Y
+	ldy .bXPos                   ; load x position into Y register
+	lda (ZeroPage2),y
 	and #%00001111              ; Only low 4 bits are valid in Color RAM
-	sta bOut
+	sta .bOut
 }
 
 ;==============================================================================
@@ -292,13 +292,13 @@ libScreenSetCharacter:
 	lda ZeroPage2               ; load y position as index into list
 	asl                         ; X2 as table is in words
 	tay                         ; Copy A to Y
-	lda wScreenRAMRowStart,Y    ; load low address byte
+	lda wScreenRAMRowStart,y    ; load low address byte
 	sta ZeroPage9
-	lda wScreenRAMRowStart+1,Y  ; load high address byte
+	lda wScreenRAMRowStart+1,y  ; load high address byte
 	sta ZeroPage10
 	ldy ZeroPage1               ; load x position into Y register
 	lda ZeroPage3
-	sta (ZeroPage9),Y
+	sta (ZeroPage9),y
 	rts
 
 ;==============================================================================
@@ -359,13 +359,13 @@ libScreenSetColor:
 	lda ZeroPage2               ; load y position as index into list
 	asl                         ; X2 as table is in words
 	tay                         ; Copy A to Y
-	lda wColorRAMRowStart,Y     ; load low address byte
+	lda wColorRAMRowStart,y     ; load low address byte
 	sta ZeroPage4
-	lda wColorRAMRowStart+1,Y   ; load high address byte
+	lda wColorRAMRowStart+1,y   ; load high address byte
 	sta ZeroPage5
 	ldy ZeroPage1               ; load x position into Y register
 	lda ZeroPage3
-	sta (ZeroPage4),Y
+	sta (ZeroPage4),y
 	rts
 
 ;==============================================================================

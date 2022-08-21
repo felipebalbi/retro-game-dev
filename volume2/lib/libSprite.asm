@@ -322,16 +322,16 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 	ldx #0
 @loop:
 	; skip this sprite anim if not active
-	lda spriteAnimsActive,X
+	lda spriteAnimsActive,x
 	bne @active
 	jmp @skip
 @active:
 
 	stx spriteAnimsCurrent
-	lda spriteAnimsFrame,X
+	lda spriteAnimsFrame,x
 	sta spriteAnimsFrameCurrent
 
-	lda spriteAnimsEndFrame,X
+	lda spriteAnimsEndFrame,x
 	sta spriteAnimsEndFrameCurrent
 
 	ldy spriteAnimsCurrent
@@ -340,34 +340,34 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 	adc #SPRITERAM ; Add
 	sta SPRITE0PTR,y
 
-	dec spriteAnimsDelay,X
+	dec spriteAnimsDelay,x
 	bne @skip
 
 	; reset the delay
-	lda spriteAnimsSpeed,X
-	sta spriteAnimsDelay,X
+	lda spriteAnimsSpeed,x
+	sta spriteAnimsDelay,x
 
 	; change the frame
-	inc spriteAnimsFrame,X
+	inc spriteAnimsFrame,x
 
 	; check if reached the end frame
 	lda spriteAnimsEndFrameCurrent
-	cmp spriteAnimsFrame,X
+	cmp spriteAnimsFrame,x
 	bcs @skip
 
 	; check if looping
-	lda spriteAnimsLoop,X
+	lda spriteAnimsLoop,x
 	beq @destroy
 
 	; reset the frame
-	lda spriteAnimsStartFrame,X
-	sta spriteAnimsFrame,X
+	lda spriteAnimsStartFrame,x
+	sta spriteAnimsFrame,x
 	jmp @skip
 
 @destroy:
 	; turn off
 	lda #0
-	sta spriteAnimsActive,X
+	sta spriteAnimsActive,x
 	+LIBSPRITE_ENABLE_AV(spriteAnimsCurrent, false)
 
 @skip:
