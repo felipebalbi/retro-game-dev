@@ -25,18 +25,18 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 ;==============================================================================
 ; Macros
 
-!macro LIBSPRITE_DIDCOLLIDESP_A bSprite {
-	ldy bSprite             ; bSprite -> Y
+!macro LIBSPRITE_DIDCOLLIDESP_A .bSprite {
+	ldy .bSprite             ; bSprite -> Y
 	lda spriteNumberMask,y  ; spriteNumberMask[Y] -> A
 	and SPSPCL              ; Mask the sprite collision register
 }
 
 ;==============================================================================
 
-!macro LIBSPRITE_ENABLE_AV bSprite, bEnable {
-	ldy bSprite
+!macro LIBSPRITE_ENABLE_AV .bSprite, .bEnable {
+	ldy .bSprite
 	lda spriteNumberMask,y
-	!if bEnable {   ; Build-time condition (not run-time)
+	!if .bEnable {   ; Build-time condition (not run-time)
         ora SPENA   ; Merge with the current sprite enable register
 	} else {
         eor #$FF    ; Get mask compliment
@@ -47,8 +47,8 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 ;==============================================================================        
 
-!macro LIBSPRITE_ENABLEALL_V bEnable {
-	!if bEnable {  ; Build-time condition (not run-time)
+!macro LIBSPRITE_ENABLEALL_V .bEnable {
+	!if .bEnable {  ; Build-time condition (not run-time)
         lda #$FF    ; $FF -> A
 	} else {
         lda #0      ; 0 -> A
@@ -58,7 +58,7 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 ;==============================================================================
 
-!macro LIBSPRITE_MULTICOLORENABLEALL_V bEnable {        
+!macro LIBSPRITE_MULTICOLORENABLEALL_V .bEnable {
 	!if bEnable {    ; Build-time condition (not run-time)
         lda #$FF    ; $FF -> A
 	} else {
@@ -69,8 +69,8 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 ;==============================================================================
 
-!macro LIBSPRITE_PLAYANIM_AAAVV bSprite, bStartFrame, bEndFrame, bSpeed, bLoop {
-	ldy bSprite
+!macro LIBSPRITE_PLAYANIM_AAAVV .bSprite, .bStartFrame, .bEndFrame, .bSpeed, .bLoop {
+	ldy .bSprite
 
 	; If was inactive then needs update
 	lda spriteAnimsActive,y
@@ -78,12 +78,12 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 	; If different start frame then needs update
 	lda spriteAnimsStartFrame,y
-	cmp bStartFrame
+	cmp .bStartFrame
 	bne @changed
 
 	; If different end frame then needs update
 	lda spriteAnimsEndFrame,y
-	cmp bEndFrame
+	cmp .bEndFrame
 	bne @changed
 
 	; Else doesn't need update, skip to end
@@ -93,15 +93,15 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 @changed:
 	lda #True
 	sta spriteAnimsActive,y
-	lda bStartFrame
+	lda .bStartFrame
 	sta spriteAnimsStartFrame,y
 	sta spriteAnimsFrame,y
-	lda bEndFrame
+	lda .bEndFrame
 	sta spriteAnimsEndFrame,y
-	lda #bSpeed
+	lda #.bSpeed
 	sta spriteAnimsSpeed,y
 	sta spriteAnimsDelay,y
-	!if (bLoop) {
+	!if .bLoop {
         lda #1
 	} else {
         lda #0
@@ -112,8 +112,8 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 ;==============================================================================
 
-!macro LIBSPRITE_PLAYANIM_AVVVV bSprite, bStartFrame, bEndFrame, bSpeed, bLoop {
-	ldy bSprite
+!macro LIBSPRITE_PLAYANIM_AVVVV .bSprite, .bStartFrame, .bEndFrame, .bSpeed, .bLoop {
+	ldy .bSprite
 
 	; If was inactive then needs update
 	lda spriteAnimsActive,y
@@ -121,12 +121,12 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 	; If different start frame then needs update
 	lda spriteAnimsStartFrame,y
-	cmp #bStartFrame
+	cmp #.bStartFrame
 	bne @changed
 
 	; If different end frame then needs update
 	lda spriteAnimsEndFrame,y
-	cmp #bEndFrame
+	cmp #.bEndFrame
 	bne @changed
 
 	; Else doesn't need update, skip to end
@@ -136,15 +136,15 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 @changed:
 	lda #1
 	sta spriteAnimsActive,y
-	lda #bStartFrame
+	lda #.bStartFrame
 	sta spriteAnimsStartFrame,y
 	sta spriteAnimsFrame,y
-	lda #bEndFrame
+	lda #.bEndFrame
 	sta spriteAnimsEndFrame,y
-	lda #bSpeed
+	lda #.bSpeed
 	sta spriteAnimsSpeed,y
 	sta spriteAnimsDelay,y
-	!if (bLoop) {
+	!if .bLoop {
         lda #1
 	} else {
         lda #0
@@ -155,32 +155,32 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETCOLOR_AA bSprite, bColor {
-	ldy bSprite     ; bSprite -> Y
-	lda bColor      ; bColor -> A
+!macro LIBSPRITE_SETCOLOR_AA .bSprite, .bColor {
+	ldy .bSprite     ; bSprite -> Y
+	lda .bColor      ; bColor -> A
 	sta SP0COL,y    ; A -> sprite[Y] color register
 }
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETCOLOR_AV bSprite, bColor {
-	ldy bSprite     ; bSprite -> Y
-	lda #bColor     ; bColor -> A
+!macro LIBSPRITE_SETCOLOR_AV .bSprite, .bColor {
+	ldy .bSprite     ; bSprite -> Y
+	lda #.bColor     ; bColor -> A
 	sta SP0COL,y    ; A -> sprite[Y] color register
 }
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETCOLOR_VV bSprite, bColor {
-	ldy #bSprite    ; bSprite -> Y
-	lda #bColor     ; bColor -> A
+!macro LIBSPRITE_SETCOLOR_VV .bSprite, .bColor {
+	ldy #.bSprite    ; bSprite -> Y
+	lda #.bColor     ; bColor -> A
 	sta SP0COL,y    ; A -> sprite[Y] color register
 }
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETALLCOLORS_V bColor {
-	lda #bColor     ; bColor -> A
+!macro LIBSPRITE_SETALLCOLORS_V .bColor {
+	lda #.bColor     ; bColor -> A
 	sta SP0COL      ; A -> sprite[0] color register
 	sta SP0COL+1    ; A -> sprite[1] color register
 	sta SP0COL+2    ; A -> sprite[2] color register
@@ -193,68 +193,68 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETFRAME_AA bSprite, bIndex {
-	ldy bSprite
+!macro LIBSPRITE_SETFRAME_AA .bSprite, .bIndex {
+	ldy .bSprite
 
 	; stop any animation
 	lda #0
 	sta spriteAnimsActive,y
 	
 	clc             ; Clear carry before add
-	lda bIndex      ; Get first number
+	lda .bIndex      ; Get first number
 	adc #SPRITERAM  ; Add
 	sta SPRITE0PTR,y
 }
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETFRAME_AV bSprite, bIndex {                                       
-	ldy bSprite
+!macro LIBSPRITE_SETFRAME_AV .bSprite, .bIndex {                                       
+	ldy .bSprite
 	lda #0                  ; stop any animation
 	sta spriteAnimsActive,y
 	clc                     ; Clear carry before add
-	lda #bIndex             ; Get first number
+	lda #.bIndex             ; Get first number
 	adc #SPRITERAM          ; Add
 	sta SPRITE0PTR,y
 }
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETFRAME_VV bSprite, bIndex {                                       
-	ldy #bSprite
+!macro LIBSPRITE_SETFRAME_VV .bSprite, .bIndex {                                       
+	ldy #.bSprite
 	lda #0                  ; stop any animation
 	sta spriteAnimsActive,y
 	clc                     ; Clear carry before add
-	lda #bIndex             ; Get first number
+	lda #.bIndex             ; Get first number
 	adc #SPRITERAM          ; Add
 	sta SPRITE0PTR,y
 }
 
 ;============================================================================== 
 
-!macro LIBSPRITE_SETMULTICOLORS_VV bColor1, bColor2 {                                     
-	lda #bColor1    ; bColor1 -> A
+!macro LIBSPRITE_SETMULTICOLORS_VV .bColor1, .bColor2 {
+	lda #.bColor1    ; bColor1 -> A
 	sta SPMC0       ; A -> sprite multicolor register 0
-	lda #bColor2    ; bColor2 -> A
+	lda #.bColor2    ; bColor2 -> A
 	sta SPMC1       ; A -> sprite multicolor register 1
 }    
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETPOSITION_AAA bSprite, wXPos, bYPos {                                    
-	lda bSprite     ; get sprite number
+!macro LIBSPRITE_SETPOSITION_AAA .bSprite, .wXPos, .bYPos {
+	lda .bSprite     ; get sprite number
 	asl             ; X2 as registers laid out 2 apart
 	tay             ; copy accumulator to y register
-	lda wXPos       ; get XPos Low Byte
+	lda .wXPos       ; get XPos Low Byte
 	sta SP0X,y      ; set the XPos sprite register
-	lda bYPos       ; get YPos
+	lda .bYPos       ; get YPos
 	sta SP0Y,y      ; set the YPos sprite register
-	ldy bSprite
+	ldy .bSprite
 	lda spriteNumberMask,y ; get sprite mask
 	eor #$FF        ; get compliment
 	and MSIGX       ; clear the bit
 	sta MSIGX       ; and store
-	lda wXPos+1     ; get XPos High Byte
+	lda .wXPos+1     ; get XPos High Byte
 	beq @end         ; skip if XPos High Byte is zero
 	lda spriteNumberMask,y  ; get sprite mask
 	ora MSIGX       ; set the bit
@@ -264,20 +264,20 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETPOSITION_AAV bSprite, wXPos, bYPos {                                    
-	lda bSprite     ; get sprite number
+!macro LIBSPRITE_SETPOSITION_AAV .bSprite, .wXPos, .bYPos {
+	lda .bSprite     ; get sprite number
 	asl             ; X2 as registers laid out 2 apart
 	tay             ; copy accumulator to y register
-	lda wXPos       ; get XPos Low Byte
+	lda .wXPos       ; get XPos Low Byte
 	sta SP0X,y      ; set the XPos sprite register
-	lda #bYPos      ; get YPos
+	lda #.bYPos      ; get YPos
 	sta SP0Y,y      ; set the YPos sprite register
-	ldy bSprite
+	ldy .bSprite
 	lda spriteNumberMask,y ; get sprite mask
 	eor #$FF        ; get compliment
 	and MSIGX       ; clear the bit
 	sta MSIGX       ; and store
-	lda wXPos+1     ; get XPos High Byte
+	lda .wXPos+1     ; get XPos High Byte
 	beq @end         ; skip if XPos High Byte is zero
 	lda spriteNumberMask,y  ; get sprite mask
 	ora MSIGX       ; set the bit
@@ -287,20 +287,20 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 ;==============================================================================
 
-!macro LIBSPRITE_SETPOSITION_VAV bSprite, wXPos, bYPos {                                    
-	lda #bSprite    ; get sprite number
+!macro LIBSPRITE_SETPOSITION_VAV .bSprite, .wXPos, .bYPos {
+	lda #.bSprite    ; get sprite number
 	asl             ; X2 as registers laid out 2 apart
 	tay             ; copy accumulator to y register
-	lda wXPos       ; get XPos Low Byte
+	lda .wXPos       ; get XPos Low Byte
 	sta SP0X,y      ; set the XPos sprite register
-	lda #bYPos      ; get YPos
+	lda #.bYPos      ; get YPos
 	sta SP0Y,y      ; set the YPos sprite register
-	ldy #bSprite
+	ldy #.bSprite
 	lda spriteNumberMask,y ; get sprite mask
 	eor #$FF        ; get compliment
 	and MSIGX       ; clear the bit
 	sta MSIGX       ; and store
-	lda wXPos+1     ; get XPos High Byte
+	lda .wXPos+1     ; get XPos High Byte
 	beq @end         ; skip if XPos High Byte is zero
 	lda spriteNumberMask,y  ; get sprite mask
 	ora MSIGX       ; set the bit
@@ -311,7 +311,7 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 ;==============================================================================
 
 !macro LIBSPRITE_STOPANIM_A bSprite {
-	ldy bSprite                 ; bSprite -> Y
+	ldy .bSprite                 ; bSprite -> Y
 	lda #0                      ; 0 -> A
 	sta spriteAnimsActive,y     ; A -> spriteAnimsActive[Y]
 }

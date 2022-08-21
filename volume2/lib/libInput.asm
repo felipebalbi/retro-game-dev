@@ -15,7 +15,7 @@ GameportFireMask	    = %00010000
 ;;; ============================================================================
 ;;; Macros
 
-!macro LIBINPUT_GET_V bPortMask {
+!macro LIBINPUT_GET_V .bPortMask {
 	lda CIAPRA	; Load joystick 2 state to A
-	and #bPortMask	; Mask out direction/fire required
+	and #.bPortMask	; Mask out direction/fire required
 }	; Test with bne immediately after the call
