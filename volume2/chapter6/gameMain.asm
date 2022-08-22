@@ -47,6 +47,9 @@ gameMainInit:
 ;;; Update
 
 gameMainUpdate:
+	+LIBSCREEN_WAIT_V 250				; Wait for scanline 250
+	+LIBSPRITE_UPDATE				; Update the sprites
+	jsr gamePlayerUpdate				; Update the player subroutines
 	jmp gameMainUpdate				; Jump back, infinite loop
 
 ;;; ============================================================================

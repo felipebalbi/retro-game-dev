@@ -69,13 +69,13 @@ gPUPRight:
 
 gPUPUp:
 	+LIBINPUT_GET_V GameportUpMask		; Check up
-	bne gPUPUp				; If up not pressed, skip to down check
+	bne gPUPDown				; If up not pressed, skip to down check
 	+LIBMATH_SUB8BIT_AVA bPlayerY, PlayerSpeed, bPlayerY ; Subtract Y speed
 	jmp gPUPEndmove				; Skip all other input checks
 
 gPUPDown:
 	+LIBINPUT_GET_V GameportDownMask	; Check down
-	bne gPUPUp				; If down not pressed, skip to endmove
+	bne gPUPEndmove				; If down not pressed, skip to endmove
 	+LIBMATH_ADD8BIT_AVA bPlayerY, PlayerSpeed, bPlayerY ; Add Y speed
 
 gPUPEndmove:
@@ -121,7 +121,7 @@ gPUIUp:
 	jsr gamePlayerSetAnimationUp
 
 gPUIDown:
-	+LIBINPUT_GET_V GameportUpMask		; Check down
+	+LIBINPUT_GET_V GameportDownMask	; Check down
 	bne gPUIEnd				; If down not pressed, skip to end
 	jsr gamePlayerSetAnimationDown
 
@@ -290,7 +290,7 @@ gamePlayerSetAnimationUp:
 ;;; ============================================================================
 
 gamePlayerSetAnimationDown:
-	lda #PlayerAnimUp
+	lda #PlayerAnimDown
 	sta bPlayerAnim
 	+LIBSPRITE_STOPANIM_A bPlayerSprite
 	+LIBSPRITE_PLAYANIM_AVVVV bPlayerSprite, 6, 7, PlayerAnimDelay, True
