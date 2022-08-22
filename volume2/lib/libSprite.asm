@@ -59,7 +59,7 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 ;==============================================================================
 
 !macro LIBSPRITE_MULTICOLORENABLEALL_V .bEnable {
-	!if bEnable {    ; Build-time condition (not run-time)
+	!if .bEnable {    ; Build-time condition (not run-time)
         lda #$FF    ; $FF -> A
 	} else {
         lda #0      ; 0 -> A
@@ -368,7 +368,7 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 	; turn off
 	lda #0
 	sta spriteAnimsActive,x
-	+LIBSPRITE_ENABLE_AV(spriteAnimsCurrent, false)
+	+LIBSPRITE_ENABLE_AV spriteAnimsCurrent, False
 
 @skip:
 	; loop for each sprite anim
