@@ -3,7 +3,7 @@ CHAP		:= chapter15
 PRG		:= $(CHAP).prg
 SYM		:= $(PRG:%.prg=%.sym)
 D64		:= $(PRG:%.prg=%.d64)
-DISK		:= $(basename $(SRC))
+DISK		:= $(CHAP)
 
 # Pretty print
 V		= @
