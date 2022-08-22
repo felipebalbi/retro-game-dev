@@ -310,7 +310,7 @@ spriteNumberMask:               !byte %00000001, %00000010, %00000100, %00001000
 
 ;==============================================================================
 
-!macro LIBSPRITE_STOPANIM_A bSprite {
+!macro LIBSPRITE_STOPANIM_A .bSprite {
 	ldy .bSprite                 ; bSprite -> Y
 	lda #0                      ; 0 -> A
 	sta spriteAnimsActive,y     ; A -> spriteAnimsActive[Y]
