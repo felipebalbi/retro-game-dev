@@ -144,7 +144,7 @@ gameMainIRQ3:
 gameMainIRQ4:
 	+LIBRASTERIRQ_START_V IrqFast					; Start the irq
 	+GAMEMAIN_SPRITESUPDATE_VV wXPosRow4Array, Irq4Scanline + ScanlineOffset, PURPLE
-	+LIBRASTERIRQ_SET_VAV Irq2Scanline, gameMainIRQ5, IrqFast	; Point to 2nd irq
+	+LIBRASTERIRQ_SET_VAV Irq5Scanline, gameMainIRQ5, IrqFast	; Point to 2nd irq
 	+LIBRASTERIRQ_END_V IrqFast					; End the irq
 
 gameMainIRQ5:
