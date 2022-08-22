@@ -42,7 +42,9 @@ RM		:= $(shell which rm)
 C1541		:= $(shell which c1541)
 
 # Flags
-ASFLAGS		:= --color -l $(SYM1) -I ../lib/ -I ../assets/
+ASFLAGS1	:= --color -l $(SYM1) -I ../lib/ -I ../assets/
+ASFLAGS2	:= --color -l $(SYM2) -I ../lib/ -I ../assets/
+ASFLAGS3	:= --color --vicelabels $(SYM3) -I ../lib/ -I ../assets/
 C1541_FLAGS1	:= -format $(DISK1),1 d64 $(D641) 8 -attach $(D641)	\
                    $(foreach p,$(PRG1),-write $(p) $(subst .prg,,$(p)))
 C1541_FLAGS2	:= -format $(DISK2),1 d64 $(D642) 8 -attach $(D642)	\
@@ -63,13 +65,13 @@ $(D643): $(PRG3)
 	$(QUIET_D64) $(C1541) $(C1541_FLAGS3) 1> /dev/null
 
 $(PRG1): $(SRC1)
-	$(QUIET_AS) $(AS) $(ASFLAGS) -o $@ -f cbm $<
+	$(QUIET_AS) $(AS) $(ASFLAGS1) -o $@ -f cbm $<
 
 $(PRG2): $(SRC2)
-	$(QUIET_AS) $(AS) $(ASFLAGS) -o $@ -f cbm $<
+	$(QUIET_AS) $(AS) $(ASFLAGS2) -o $@ -f cbm $<
 
 $(PRG3): $(SRC3)
-	$(QUIET_AS) $(AS) $(ASFLAGS) -o $@ -f cbm $<
+	$(QUIET_AS) $(AS) $(ASFLAGS3) -o $@ -f cbm $<
 
 run1: run
 
