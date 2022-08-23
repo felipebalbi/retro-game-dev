@@ -15,6 +15,10 @@ PlayerAnimLeft			= 1
 PlayerAnimRight			= 2
 PlayerAnimUp			= 3
 PlayerAnimDown			= 4
+PlayerLeftPointX		= 5
+PlayerRightPointX		= 20
+PlayerPointY			= 31 ; 50 - 19: offset from screen top where sprite is visible
+PlayerCharCollIndex		= 100
 PlayerScreenTopLeft		= 0
 PlayerScreenTopRight		= 1
 PlayerScreenBottomLeft		= 2
@@ -26,8 +30,14 @@ PlayerScreenBottomRight		= 3
 bPlayerSprite:			!byte 0
 wPlayerX:			!word PlayerXStart
 bPlayerY:			!byte PlayerYStart
+wPlayerPreviousX:		!word 0
+bPlayerPreviousY:		!byte 0
 bPlayerAnim:			!byte PlayerAnimIdle
 bMapScreen:			!byte 0
+wPlayerCollisionX:		!word 0
+bPlayerCollisionY:		!byte 0
+bPlayerXChar:			!byte 0
+bPlayerYChar:			!byte 0
 
 ;;; ============================================================================
 ;;; Jump Tables
@@ -61,6 +71,8 @@ gamePlayerUpdate:
 	jsr gamePlayerUpdatePosition
 	jsr gamePlayerUpdateAnimation
 	jsr gamePlayerUpdateMap
+	jsr gamePlayerUpdateBackgroundCollisions
+	jsr gamePlayerUpdateSprite
 	rts
 
 ;;; ============================================================================
@@ -308,6 +320,54 @@ gamePlayerSetAnimationDown:
 
 ;;; ============================================================================
 
+gamePlayerUpdateBackgroundCollisions:
+	;; Left point
+	+LIBMATH_SUB16BIT_AVA wPlayerX, PlayerLeftPointX, wPlayerCollisionX
+	+LIBMATH_SUB8BIT_AVA bPlayerY, PlayerPointY, bPlayerCollisionY
+
+	jsr gamePlayerUpdateCollisionsCollide
+
+	;; Right point
+	+LIBMATH_SUB16BIT_AVA wPlayerX, PlayerRightPointX, wPlayerCollisionX
+
+	jsr gamePlayerUpdateCollisionsCollide
+
+	;; Store previous player position
+	lda wPlayerX+1
+	sta wPlayerPreviousX+1
+	lda wPlayerX
+	sta wPlayerPreviousX
+	lda bPlayerY
+	sta bPlayerPreviousY
+	rts
+
+;;; ============================================================================
+
+gamePlayerUpdateCollisionsCollide:
+	;; Stage 1 - Find the character x & y from the pixel x & y
+	+LIBSCREEN_PIXELTOCHAR_AAAA wPlayerCollisionX, bPlayerCollisionY, bPlayerXChar, bPlayerYChar
+
+	;; Stage 2 - Get the character ID from the character x & y
+	+LIBSCREEN_GETCHARACTER_AAA bPlayerXChar, bPlayerYChar, ZeroPage1
+
+	;; Stage 3 - Check if character ID > PlayerCharCollIndex
+	lda #PlayerCharCollIndex
+	cmp ZeroPage1
+	bcs gPUCCNoCollision
+
+	;; Stage 4 - Collision response reset to previous position
+	lda wPlayerPreviousX+1
+	sta wPlayerX+1
+	lda wPlayerPreviousX
+	sta wPlayerX
+	lda bPlayerPreviousY
+	sta bPlayerY
+
+gPUCCNoCollision:
+	rts
+
+;;; ============================================================================
+
 gamePlayerUpdateMap:
 	lda bMapScreen				; Get the current state into A
 	asl					; Multiply by 2
@@ -468,4 +528,11 @@ gPUS4EndX:
 	sta bMapScreen
 
 gPUS4EndY:
+	rts
+
+;;; ============================================================================
+
+gamePlayerUpdateSprite:
+	;; Set the player's sprite position
+	+LIBSPRITE_SETPOSITION_AAA bPlayerSprite, wPlayerX, bPlayerY
 	rts
