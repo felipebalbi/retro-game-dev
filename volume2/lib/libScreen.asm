@@ -197,7 +197,7 @@ wColorRAMRowStart: ; COLORRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
 ;==============================================================================
 
 !macro LIBSCREEN_SETBACKGROUND_AA .wBackground, .wColor {
-	+LIBSCREEN_SETDISPLAYENABLE_V false ; Disable display while updating
+	+LIBSCREEN_SETDISPLAYENABLE_V False ; Disable display while updating
 
 	ldx #0                  ; set x counter to 0
 @loop:
@@ -210,7 +210,7 @@ wColorRAMRowStart: ; COLORRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
 	lda .wBackground+250,x   ; get background + 250 + x
 	sta SCREENRAM+250,x     ; set SCREENRAM + 250 + x
 	tay                     ; transfer accumulator to y register
-	lda wColor,y            ; get color + y
+	lda .wColor,y            ; get color + y
 	sta COLORRAM+250,x      ; set COLORRAM + 250 + x
 	
 	lda .wBackground+500,x   ; get background + 500 + x
@@ -229,7 +229,7 @@ wColorRAMRowStart: ; COLORRAM + 40*0, 40*1, 40*2, 40*3, 40*4 ... 40*24
 	cpx #251
 	bcc @loop                ; loop 250 times (4 sections x 250 = 1000 bytes set)
 	
-	+LIBSCREEN_SETDISPLAYENABLE_V true ; Re-enable display
+	+LIBSCREEN_SETDISPLAYENABLE_V True ; Re-enable display
 }
 
 ;==============================================================================
@@ -384,7 +384,7 @@ libScreenSetColor:
 
 !macro LIBSCREEN_SETMULTICOLORMODE_V .bEnable {
 	lda SCROLX
-	!if .bEnable. {          ; Build-time(not run-time)
+	!if .bEnable {          ; Build-time(not run-time)
         ora #%00010000      ; Set bit 4
 	} else {
         and #%11101111      ; Clear bit 4
