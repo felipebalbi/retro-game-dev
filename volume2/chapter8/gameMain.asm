@@ -2,7 +2,7 @@
 !convtab scr
 
 ;;; ============================================================================
-;;; 		   RetroGameDev C64 Edition Volume 2 Chapter 5
+;;; 		   RetroGameDev C64 Edition Volume 2 Chapter 8
 ;;; ============================================================================
 ;;; Basic Loader
 
