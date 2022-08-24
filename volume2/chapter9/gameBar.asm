@@ -69,14 +69,14 @@ bBarTimerIsZero:		!byte 0
 ;;; JumpTables
 
 gameBarUpdateStateJumpTable:
-	!word 0 ;gameBarUpdateStateWalking
-	!word 0 ;gameBarUpdateStateWaiting
-	!word 0 ;gameBarUpdateStateDrinking
+	!word gameBarUpdateStateWalking
+	!word gameBarUpdateStateWaiting
+	!word gameBarUpdateStateDrinking
 
 gameBarUpdateSpriteJumpTable:
-	!word 0 ;gameBarUpdateSpriteWalking
-	!word 0 ;gameBarUpdateSpriteWaiting
-	!word 0 ;gameBarUpdateSpriteDrinking
+	!word gameBarUpdateSpriteWalking
+	!word gameBarUpdateSpriteWaiting
+	!word gameBarUpdateSpriteDrinking
 
 ;;; ============================================================================
 ;;; Subroutines
@@ -187,6 +187,31 @@ gameBarGetVariables:
 
 ;;; ============================================================================
 
+gameBarSetVariables:
+	;; Restore X register
+	ldx bBarElement
+
+	;; Write this element's variables
+	;; Read only variables need not be in here
+	lda bBarState
+	sta bBarStateArray,x
+	lda wBarX
+	sta wBarXArray,x
+	lda bBarY
+	sta bBarYArray,x
+	lda bBarWalkDir
+	sta bBarWalkDirArray,x
+	lda bBarChair
+	sta bBarChairArray,x
+	lda wBarTimer+1
+	sta bBarTimerHArray,x
+	lda wBarTimer
+	sta bBarTimerLArray,x
+
+	rts
+
+;;; ============================================================================
+
 gameBarUpdateState:
 	jsr gameBarUpdateStateTimer
 
@@ -201,16 +226,96 @@ gameBarUpdateState:
 
 ;;; ============================================================================
 
-gameBarSetVariables:
+gameBarUpdateStateTimer:
+	lda #False
+	sta bBarTimerIsZero
+
+	lda wBarTimer+1
+	bne gBUSTimerHighNotZero
+	lda wBarTimer
+	beq gBUSTimerIsZero
+
+gBUSTimerHighNotZero:
+	;; decrement the timer
+	+LIBMATH_SUB16BIT_AVA wBarTimer, 1, wBarTimer
 	rts
 
+gBUSTimerIsZero:
+	lda #True
+	sta bBarTimerIsZero
+	rts
+
+;;; ============================================================================
+
+gameBarUpdateStateWalking:
+	lda bBarWalkY				; Get the Y position for this customer
+	sta bBarY				; Set the Y position for this customer
+
+	lda bBarTimerIsZero			; If bBarTimerIsZero = True, then zero flag = False
+	bne gBUSWTimerIsZero			; If zero flag not set, jump to gBUSWTimerIsZero
+	jmp gBUSWEnd				; Jump to end
+
+gBUSWTimerIsZero:
+	lda bBarWalkDir				; Is facing left?
+	beq gBUSWRightWalk			; No, so jump to walking right
+
+	;; Walking left
+	dec wBarX				; Move left
+	beq gBUSWEndSkip			; If at left edge, jump to gBUSWEndSkip
+	jmp gBUSWEnd				; Jump to end
+
+gBUSWEndSkip:
+	;; Move right 1 so we can try again next frame if no chair is
+	;; available
+	inc wBarX
+
+	;; Set a random chair (if available)
+	+LIBMATH_RAND_AAA bMathRandoms2, bMathRandomCurrent2, ZeroPage1
+	ldy ZeroPage1
+	lda bBarChairTakenArray,y
+	bne gBUSWEnd
+
+	;; Fill the chair
+	lda #True
+	sta bBarChairTakenArray,y
+
+	;; Set the walk direction
+	lda #BarWalkDirRight
+	sta bBarWalkDir
+
+	;; Get a random timerhigh wait time (0 -> 5)
+	+LIBMATH_RAND_AAA bMathRandoms2, bMathRandomCurrent2, wBarTimer+1
+
+	;; Get a random timerlow wait time (0 -> 255)
+	+LIBMATH_RAND_AAA bMathRandoms1, bMathRandomCurrent1, wBarTimer
+
+	jmp gBUSWEnd
+
+	;; Walking Right
+gBUSWRightWalk:
+	inc wBarX				; Move right
+
+	;; Check if reached target chair position
+	ldy bBarChair
+	lda bBarChairXArray,y
+	sta ZeroPage1
+	+LIBMATH_GREATEREQUAL8BIT_AA wBarX, ZeroPage1
+	bcc gBUSWEnd				; If not reached chair, jump to end
+	
+	;; Set the state
+	lda #BarStateWaiting
+	sta bBarState
+
+	;; Set the timer
+	lda #BarSittingWait
+	sta wBarTimer+1
+
+gBUSWEnd:
+	rts
+	
 ;;; ============================================================================
 
 gameBarUpdateSprite:
 	rts
 
-;;; ============================================================================
-
-gameBarUpdateStateTimer:
-	rts
 
