@@ -91,7 +91,7 @@ gBILoop:
 	sta wBarX
 	sta bBarWalkDir
 
-	;; Fil the char
+	;; Fill the char
 	lda #True
 	sta bBarChairTakenArray,x
 

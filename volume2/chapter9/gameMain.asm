@@ -47,6 +47,9 @@ gameMainInit:
 	+LIBSCREEN_SETCHARMEMORY_V CharacterSlot2000	; Set the custom charset
 	+LIBSCREEN_SETBACKGROUND_AA gameDataBackground + PlayerScreenTopLeft*1000, gameDataBackgroundCol ; Set the background screen
 
+	+LIBMATH_RANDSEED_AA bMathRandomCurrent1, TIMALO ; Seed the random number lists
+	+LIBMATH_RANDSEED_AA bMathRandomCurrent2, TIMALO
+
 	jsr gamePlayerInit				; Call the player initialization subroutine
 	jsr gameBarInit					; Call the bar initialize subroutine
 
