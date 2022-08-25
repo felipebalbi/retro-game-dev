@@ -315,7 +315,153 @@ gBUSWEnd:
 	
 ;;; ============================================================================
 
-gameBarUpdateSprite:
+gameBarUpdateStateWaiting:
+	lda bBarChairY
+	sta bBarY
+
+	;; Check is drink delivered
+
+	;; needs to have fire pressed
+	+LIBINPUT_GET_V GameportFireMask
+	bne gBUSWDrinkNotDelivered
+
+	;; and be carrying the correct drink color
+	lda bBarDrinkColor
+	cmp bPlayerDrinkCarrying
+	bne gBUSWDrinkNotDelivered
+
+	;; and be standing on the correct location
+	lda bPlayerBackgroundChar
+	cmp bBarDrinkChar1
+	beq gBUSWDrinkIsDelivered
+
+	cmp bBarDrinkChar2
+	beq gBUSWDrinkIsDelivered
+
+	jmp gBUSWDrinkNotDelivered
+
+	;; Drink is delivered
+
+gBUSWDrinkIsDelivered:
+	;; Set the state
+	lda #BarStateDrinking
+	sta bBarState
+
+	;; Set the timer
+	lda #BarDrinkingWait
+	sta wBarTimer+1
+
+	;; Clear the drink being carried
+	lda #WHITE
+	sta bPlayerDrinkCarrying
+
+	jmp gBUSWaEnd
+
+	;; Drink is not delivered
+gBUSWDrinkNotDelivered:
+	;; leave if the timer runs out
+	lda bBarTimerIsZero
+	beq gBUSWaEnd
+
+	;; Set the walk direction
+	lda #BarWalkDirLeft
+	sta bBarWalkDir
+
+	;; Clear the chair
+	lda #False
+	ldy bBarChair
+	sta bBarChairTakenArray,y
+
+	;; Set the state
+	lda #BarStateWalking
+	sta bBarState
+
+gBUSWaEnd:
 	rts
 
+;;; ============================================================================
 
+gameBarUpdateStateDrinking:
+	;; Leave if the timer runs out
+	lda bBarTimerIsZero
+	beq gBUSDEnd
+
+	;; Set the walk direction
+	lda #BarWalkDirLeft
+	sta bBarWalkDir
+
+	;; Clear the chair
+	lda #False
+	ldy bBarChair
+	sta bBarChairTakenArray,y
+
+	;; Set the state
+	lda #BarStateWalking
+	sta bBarState
+
+gBUSDEnd:
+	rts
+
+;;; ============================================================================
+
+gameBarUpdateSprite:
+	+LIBSPRITE_SETPOSITION_AAA bBarSprite, wBarX, bBarY
+	+LIBSPRITE_SETCOLOR_AA bBarSprite, bBarSpriteColor
+
+	lda bBarState				; Get the current state into A
+	asl					; Multiply by 2
+	tay					; Copy A to Y
+	lda gameBarUpdateSpriteJumpTable,y	; Lookup low byte
+	sta ZeroPage1				; Store in a temporary variable
+	lda gameBarUpdateSpriteJumpTable+1,y	; Lookup high byte
+	sta ZeroPage2				; Store in temporary variable+1
+	jmp (ZeroPage1)				; Indirect jump to subroutine
+
+;;; ============================================================================
+
+gameBarUpdateSpriteWalking:
+	lda bBarWalkDir
+	beq gBUSWRight
+
+	;; Walking left
+	+LIBSPRITE_PLAYANIM_AAAVV bBarSprite, bBarWalk3, bBarWalk4, BarAnimDelay, True
+	jmp gBUSpWaEnd
+
+	;; Walking right
+gBUSWRight:
+	+LIBSPRITE_PLAYANIM_AAAVV bBarSprite, bBarWalk1, bBarWalk2, BarAnimDelay, True
+
+gBUSpWaEnd:
+	;; Clear the drink icon
+	+LIBSCREEN_SETCHARACTER_S_AAV bBarDrinkColumn1, bBarDrinkRow, Space
+	+LIBSCREEN_SETCHARACTER_S_AAV bBarDrinkColumn2, bBarDrinkRow, Space
+
+	rts
+
+;;; ============================================================================
+
+gameBarUpdateSpriteWaiting:
+	;; Draw the sitting sprite
+	+LIBSPRITE_STOPANIM_A bBarSprite
+	+LIBSPRITE_SETFRAME_AA bBarSprite, bBarSit
+
+	;; Draw the drink icon
+	+LIBSCREEN_SETCHARACTER_S_AAA bBarDrinkColumn1, bBarDrinkRow, bBarDrinkChar1
+	+LIBSCREEN_SETCOLOR_S_AAA bBarDrinkColumn1, bBarDrinkRow, bBarDrinkColor
+	+LIBSCREEN_SETCHARACTER_S_AAA bBarDrinkColumn2, bBarDrinkRow, bBarDrinkChar2
+	+LIBSCREEN_SETCOLOR_S_AAA bBarDrinkColumn2, bBarDrinkRow, bBarDrinkColor
+
+	rts
+
+;;; ============================================================================
+
+gameBarUpdateSpriteDrinking:
+	;; Draw the sitting sprite
+	+LIBSPRITE_STOPANIM_A bBarSprite
+	+LIBSPRITE_SETFRAME_AA bBarSprite, bBarSit
+
+	;; Clear the drink icon
+	+LIBSCREEN_SETCHARACTER_S_AAV bBarDrinkColumn1, bBarDrinkRow, Space
+	+LIBSCREEN_SETCHARACTER_S_AAV bBarDrinkColumn2, bBarDrinkRow, Space
+
+	rts

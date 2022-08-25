@@ -8,7 +8,11 @@
 ;;; Sprites
 
 *= $2800						; Add sprite data at the $2800 memory location
-!bin "BeachBarSprites1.bin"	
+	!bin "BeachBarSprites1.bin"
+	!bin "BeachBarSprites2.bin"
+	!bin "BeachBarSprites3.bin"
+	!bin "BeachBarSprites4.bin"
+	!bin "BeachBarSprites5.bin"
 
 ;;; ============================================================================
 ;;; Charset

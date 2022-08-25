@@ -38,6 +38,10 @@ wPlayerCollisionX:		!word 0
 bPlayerCollisionY:		!byte 0
 bPlayerXChar:			!byte 0
 bPlayerYChar:			!byte 0
+bPlayerDrinksArray:		!byte RED, GREEN, BLUE, PURPLE
+bPlayerDrinkCarrying:		!byte WHITE
+bPlayerBackgroundChar:		!byte 0
+bPlayerBackgroundColor:		!byte 0
 
 ;;; ============================================================================
 ;;; Jump Tables

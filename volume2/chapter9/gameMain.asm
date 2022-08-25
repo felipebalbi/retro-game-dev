@@ -48,6 +48,7 @@ gameMainInit:
 	+LIBSCREEN_SETBACKGROUND_AA gameDataBackground + PlayerScreenTopLeft*1000, gameDataBackgroundCol ; Set the background screen
 
 	jsr gamePlayerInit				; Call the player initialization subroutine
+	jsr gameBarInit					; Call the bar initialize subroutine
 
 ;;; ============================================================================
 ;;; Update
@@ -56,4 +57,5 @@ gameMainUpdate:
 	+LIBSCREEN_WAIT_V 250				; Wait for scanline 250
 	+LIBSPRITE_UPDATE				; Update the sprites
 	jsr gamePlayerUpdate				; Update the player subroutines
+	jsr gameBarUpdate				; Update the bar subroutines
 	jmp gameMainUpdate				; Jump back, infinite loop
