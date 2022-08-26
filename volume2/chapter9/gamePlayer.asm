@@ -17,8 +17,11 @@ PlayerAnimUp			= 3
 PlayerAnimDown			= 4
 PlayerLeftPointX		= 5
 PlayerRightPointX		= 20
+PlayerCenterPointX		= 14
 PlayerPointY			= 31 ; 50 - 19: offset from screen top where sprite is visible
 PlayerCharCollIndex		= 100
+PlayerCharCrossMin		= 71
+PlayerCharCrossMax		= 79
 PlayerScreenTopLeft		= 0
 PlayerScreenTopRight		= 1
 PlayerScreenBottomLeft		= 2
@@ -77,6 +80,7 @@ gamePlayerUpdate:
 	jsr gamePlayerUpdateMap
 	jsr gamePlayerUpdateBackgroundCollisions
 	jsr gamePlayerUpdateSprite
+	jsr gamePlayerUpdateCollectDrinks
 	rts
 
 ;;; ============================================================================
@@ -331,6 +335,12 @@ gamePlayerUpdateBackgroundCollisions:
 
 	jsr gamePlayerUpdateCollisionsCollide
 
+	;; Center point (used for drinks collisions)
+	+LIBMATH_SUB16BIT_AVA wPlayerX, PlayerCenterPointX, wPlayerCollisionX
+	+LIBSCREEN_PIXELTOCHAR_AAAA wPlayerCollisionX, bPlayerCollisionY, bPlayerXChar, bPlayerYChar
+	+LIBSCREEN_GETCHARACTER_AAA bPlayerXChar, bPlayerYChar, bPlayerBackgroundChar
+	+LIBSCREEN_GETCOLOR_AAA bPlayerXChar, bPlayerYChar, bPlayerBackgroundColor
+
 	;; Right point
 	+LIBMATH_SUB16BIT_AVA wPlayerX, PlayerRightPointX, wPlayerCollisionX
 
@@ -539,4 +549,35 @@ gPUS4EndY:
 gamePlayerUpdateSprite:
 	;; Set the player's sprite position
 	+LIBSPRITE_SETPOSITION_AAA bPlayerSprite, wPlayerX, bPlayerY
+	rts
+
+;;; ============================================================================
+
+gamePlayerUpdateCollectDrinks:
+	;; Check if the player collects a drink
+	+LIBINPUT_GET_V GameportFireMask
+	bne gPUCDEnd
+
+	lda bPlayerBackgroundChar
+	cmp #PlayerCharCrossMin
+	bmi gPUCDEnd
+
+	cmp #PlayerCharCrossMax
+	bcs gPUCDEnd
+
+	;; already carrying drink of this color
+	lda bPlayerDrinkCarrying
+	cmp bPlayerBackgroundColor
+	beq gPUCDEnd
+
+bPUCDNotEmpty:
+	+LIBMATH_SUB8BIT_AVA bPlayerBackgroundChar, 71, ZeroPage1
+
+	lda ZeroPage1
+	lsr						; divide by 2
+	tay
+	lda bPlayerDrinksArray,y
+	sta bPlayerDrinkCarrying
+
+gPUCDEnd:
 	rts
