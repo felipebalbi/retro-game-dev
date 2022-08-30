@@ -84,6 +84,8 @@ gamePlayerUpdate:
 	jsr gamePlayerUpdateMap
 	jsr gamePlayerUpdateSprite
 	jsr gamePlayerUpdateCollectDrinks
+	jsr gamePlayerUpdateFillDrinks
+	jsr gamePlayerUpdateFillTowels
 	rts
 
 ;;; ============================================================================
@@ -407,6 +409,7 @@ gPUSCOK:
 	bne gPUSCEnd
 
 	;; Will decrease energy here
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Crab
 	lda #PlayerSpriteCollWait
 	sta bPlayerSpriteCollision
 
@@ -601,6 +604,10 @@ gamePlayerUpdateCollectDrinks:
 	;; already carrying drink of this color
 	lda bPlayerDrinkCarrying
 	cmp bPlayerBackgroundColor
+
+	;; Play the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Great
+
 	beq gPUCDEnd
 
 bPUCDNotEmpty:
@@ -613,4 +620,44 @@ bPUCDNotEmpty:
 	sta bPlayerDrinkCarrying
 
 gPUCDEnd:
+	rts
+
+;;; ============================================================================
+
+gamePlayerUpdateFillDrinks:
+	;; Check if the player fills the drinks
+	+LIBINPUT_GET_V GameportFireMask
+	bne gPUFDEnd
+
+	lda bPlayerBackgroundChar
+	cmp #79
+	bmi gPUFDEnd				; bPlayerBackgroundChar is < 79
+
+	cmp #81
+	bcs gPUFDEnd				; bPlayerBackgroundChar is > 81
+
+	;; Play the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Tadaah
+	
+gPUFDEnd:
+	rts
+
+;;; ============================================================================
+
+gamePlayerUpdateFillTowels:
+	;; Check if the player fills the towels
+	+LIBINPUT_GET_V GameportFireMask
+	bne gPUFTEnd
+
+	lda bPlayerBackgroundChar
+	cmp #46
+	bmi gPUFTEnd				; bPlayerBackgrounChar is < 46
+
+	cmp #48
+	bmi gPUFTEnd				; bPlayerBackgrounChar is > 48
+
+	;; Player the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Tadaah
+
+gPUFTEnd:
 	rts

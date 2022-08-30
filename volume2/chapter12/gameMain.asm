@@ -27,8 +27,8 @@
 ;;; Includes
 
 !src "libIncludes.asm"
-!src "gamePlayer.asm"
 !src "gameData.asm"
+!src "gamePlayer.asm"
 !src "gameBar.asm"
 !src "gameLoungers.asm"
 !src "gameCrabs.asm"
@@ -58,6 +58,8 @@ gameMainInit:
 
 	+LIBMATH_RANDSEED_AA bMathRandomCurrent1, TIMALO ; Seed the random number lists
 	+LIBMATH_RANDSEED_AA bMathRandomCurrent2, TIMALO
+
+	+LIBSOUND_INIT_A gameDataSID			; Initialize the sound
 	+LIBRASTERIRQ_INIT_VAV Irq1ScanLine, gameMainIRQ1, IrqFast ; Initialize IRQ
 
 	jsr gamePlayerInit				; Call the player initialization subroutine
@@ -81,6 +83,7 @@ gameMainUpdate:
 
 gameMainIRQ1:
 	+LIBRASTERIRQ_START_V IrqFast 			; Start the IRQ
+	+LIBSOUND_UPDATE_A gameDataSID			; Update the sound player
 	jsr gameCrabsUpdateTop
 	+LIBRASTERIRQ_SET_VAV Irq2ScanLine, gameMainIRQ2, IrqFast ; Point to 2nd IRQ
 	+LIBRASTERIRQ_END_V IrqFast			; End the IRQ

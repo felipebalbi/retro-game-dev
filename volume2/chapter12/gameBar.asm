@@ -310,6 +310,9 @@ gBUSWRightWalk:
 	lda #BarSittingWait
 	sta wBarTimer+1
 
+	;; Play the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_NewCustomer
+
 gBUSWEnd:
 	rts
 	
@@ -355,6 +358,9 @@ gBUSWDrinkIsDelivered:
 	lda #WHITE
 	sta bPlayerDrinkCarrying
 
+	;; Play the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Tadaah
+
 	jmp gBUSWaEnd
 
 	;; Drink is not delivered
@@ -375,6 +381,9 @@ gBUSWDrinkNotDelivered:
 	;; Set the state
 	lda #BarStateWalking
 	sta bBarState
+
+	;; Play the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Fail2
 
 gBUSWaEnd:
 	rts

@@ -337,6 +337,9 @@ gLUSWRightWalk:
 	lda #LoungersStandingWait
 	sta wLoungersTimer+1
 
+	;; Play the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Fail1
+
 gLUSWEnd:
 	rts
 
@@ -356,6 +359,10 @@ gameLoungersUpdateStateWaiting:
 
 	cmp bLoungersTowelChar2
 	beq gLUSWCheckTowels
+
+	;; Play the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Fail1
+	
 	jmp gLUSWTowelNotDelivered
 
 gLUSWCheckTowels:
@@ -369,6 +376,10 @@ gLUSTowelIsDelivered:
 	;; Set the timer
 	lda #LoungersLyingWait
 	sta wLoungersTimer+1
+
+	;; Play the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Tadaah
+
 	jmp gLUSWaEnd
 
 	;; Tower is Not Delivered
@@ -390,6 +401,9 @@ gLUSWTowelNotDelivered:
 	;; Set the state
 	lda #LoungersStateWalking
 	sta bLoungersState
+
+	;; Play the SFX
+	+LIBSOUND_PLAYSFX_AA gameDataSID, SFX_Fail2
 
 gLUSWaEnd:
 	rts
