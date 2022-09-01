@@ -36,7 +36,7 @@ wHudScore:			!word 0
 wHudHiScore:			!word 0
 tHudStartText:			!text "press fire to start"
 				!byte 0
-tHudStartClearText:		!text "			  "
+tHudStartClearText:		!text "                   "
 				!byte 0
 
 ;; =============================================================================
