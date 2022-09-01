@@ -37,7 +37,7 @@ bPlayerY:			!byte PlayerYStart
 wPlayerPreviousX:		!word 0
 bPlayerPreviousY:		!byte 0
 bPlayerAnim:			!byte PlayerAnimIdle
-bPlayerMapScreen:			!byte 0
+bPlayerMapScreen:		!byte 0
 wPlayerCollisionX:		!word 0
 bPlayerCollisionY:		!byte 0
 bPlayerXChar:			!byte 0
@@ -429,7 +429,7 @@ gPUSCEnd:
 ;;; ============================================================================
 
 gamePlayerUpdateMap:
-	lda bPlayerMapScreen				; Get the current state into A
+	lda bPlayerMapScreen			; Get the current state into A
 	asl					; Multiply by 2
 	tay					; Copy A to Y
 	lda gamePlayerMapJumpTable,y		; Lookup low byte
