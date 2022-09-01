@@ -83,6 +83,8 @@ gameBarUpdateSpriteJumpTable:
 
 gameBarInit:
 	ldx #0
+	stx bBarSprite
+
 gBILoop:
 	inc bBarSprite		; x + 1
 	jsr gameBarGetVariables
